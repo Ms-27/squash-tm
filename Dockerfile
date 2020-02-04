@@ -7,6 +7,7 @@ RUN rm squash-tm-1.21.0.RELEASE.tar.gz
 
 EXPOSE 8080
 
+
 WORKDIR /squash-tm/bin
 RUN chmod +x startup.sh
 CMD ./startup.sh
