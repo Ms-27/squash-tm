@@ -1,0 +1,25 @@
+---
+version: '3.7'
+services: 
+  squashtm:
+    image: squashtm
+    ports:
+      # On expose le port 8080 du service squash auquel je pourrais accéder via localhost:8081
+      - 8081:8080/tcp
+    links:
+      - postgre-squash
+    environment:
+      - USER=${DB_USER}
+      - PASSWORD=${DB_PASSWORD}
+      - DATABASE=${DB_DATABASE}
+
+  postgre-squash:
+    image: postgres:9.6
+    volumes:
+      - DB_backup:/var/lib/postgresql/data
+    environment:
+      - POSTGRES_USER=${DB_USER}
+      - POSTGRES_PASSWORD=${DB_PASSWORD}
+      - POSTGRES_DB=${DB_DATABASE}
+volumes:
+  DB_backup:
