@@ -1,32 +1,33 @@
 FROM openjdk:8
 LABEL maintainer="oborde@henix.fr"
 
-ARG SQUASH_VERSION=squash-tm-1.21.0.RELEASE.tar.gz
+ARG SQUASH_VERSION=1.21.0
+
+# ARG est pour le build, mais on a besoin de la valeur pour le run donc:
+ENV SQUASH_VERSION ${SQUASH_VERSION}   
 
 ENV USER squash-tm
 ENV PASSWORD initial_pw
 ENV DATABASE squashtm
+ENV PORT 5432
 
 EXPOSE 8080
 
-RUN wget http://repo.squashtest.org/distribution/${SQUASH_VERSION}
-RUN tar xvf ${SQUASH_VERSION}
-RUN rm ${SQUASH_VERSION}
+RUN wget http://repo.squashtest.org/distribution/squash-tm-${SQUASH_VERSION}.RELEASE.tar.gz
+RUN tar xvf squash-tm-${SQUASH_VERSION}.RELEASE.tar.gz
+RUN rm squash-tm-${SQUASH_VERSION}.RELEASE.tar.gz
 
-EXPOSE 8080
-
-##
 # On peuple la BDD postgre sur le conteneur postgre-squash
 RUN apt update
 RUN apt install -y postgresql-client-9.6
 # On modifie le startup.sh avec les paramètres de connexion à la BDD
 WORKDIR /squash-tm/bin
 RUN sed -i "s/DB_TYPE=h2/DB_TYPE=postgresql/" startup.sh
-RUN sed -i "s!DB_URL=jdbc:h2:../data/squash-tm!DB_URL=jdbc:postgresql://postgre-squash:5432/\${DATABASE}!" startup.sh
+RUN sed -i "s!DB_URL=jdbc:h2:../data/squash-tm!DB_URL=jdbc:postgresql://postgre-squash:\${PORT}/\${DATABASE}!" startup.sh
 RUN sed -i "s/DB_USERNAME=sa/DB_USERNAME=\${USER}/" startup.sh
 RUN sed -i "s/DB_PASSWORD=sa/DB_PASSWORD=\${PASSWORD}/" startup.sh
 RUN chmod +x startup.sh
-##
-COPY db_init.sh .
 
-CMD chmod +x db_init.sh ; ./db_init.sh
+COPY init_and_start.sh .
+
+CMD chmod +x init_and_start.sh ; ./init_and_start.sh
