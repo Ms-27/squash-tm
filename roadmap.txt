@@ -1,5 +1,5 @@
 ## ROADMAP
-    sudo docker volumt create DB_backup
+    sudo docker volume create DB_backup
 
     sudo docker run --name postgre-squash --rm --mount source=DB_backup,target=/var/lib/postgresql/data -e POSTGRES_DB=squashtm -e POSTGRES_USER=squash-tm -e POSTGRES_PASSWORD=initial_pw -d postgres:9.6
 
